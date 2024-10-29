@@ -7,7 +7,7 @@ class colors:
     ENDC = '\033[0m'
 
 #Read the xml file
-xmlFile = minidom.parse("./xml/ebay.xml")
+xmlFile = minidom.parse("./xml/output.xml")
 
 def print_node(node, indent=0):
     # Print element name with indentation
