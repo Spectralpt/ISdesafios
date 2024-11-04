@@ -1,7 +1,7 @@
 import pandas as pd
 import xml.etree.ElementTree as ET
 
-df = pd.read_csv('./csv/car.data', sep=',')
+df = pd.read_csv('./csv/car.csv', sep=',')
 
 root = ET.Element("root")
 
