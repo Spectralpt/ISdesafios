@@ -1,0 +1,26 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="root">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="item" maxOccurs="unbounded" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:float" name="fixed_acidity"/>
+              <xs:element type="xs:float" name="volatile_acidity"/>
+              <xs:element type="xs:float" name="citric_acid"/>
+              <xs:element type="xs:float" name="residual_sugar"/>
+              <xs:element type="xs:float" name="chlorides"/>
+              <xs:element type="xs:float" name="free_sulfur_dioxide"/>
+              <xs:element type="xs:float" name="total_sulfur_dioxide"/>
+              <xs:element type="xs:float" name="density"/>
+              <xs:element type="xs:float" name="pH"/>
+              <xs:element type="xs:float" name="sulphates"/>
+              <xs:element type="xs:float" name="alcohol"/>
+              <xs:element type="xs:float" name="quality"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
