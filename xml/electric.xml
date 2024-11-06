@@ -1,0 +1,12 @@
+<filtered_catalog>
+  <item>
+    <name>Toyota Camry Hybrid</name>
+    <year>2006</year>
+    <selling_price>310000</selling_price>
+    <km_driven>62000</km_driven>
+    <fuel>Electric</fuel>
+    <seller_type>Dealer</seller_type>
+    <transmission>Automatic</transmission>
+    <owner>Second Owner</owner>
+  </item>
+</filtered_catalog>
