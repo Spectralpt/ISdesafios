@@ -1,0 +1,22 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="root">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="item" maxOccurs="unbounded" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="name"/>
+              <xs:element type="xs:short" name="year"/>
+              <xs:element type="xs:int" name="selling_price"/>
+              <xs:element type="xs:int" name="km_driven"/>
+              <xs:element type="xs:string" name="fuel"/>
+              <xs:element type="xs:string" name="seller_type"/>
+              <xs:element type="xs:string" name="transmission"/>
+              <xs:element type="xs:string" name="owner"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

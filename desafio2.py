@@ -1,24 +1,31 @@
 import pandas as pd
-import xml.etree.ElementTree as ET
 from lxml import etree
 
 xml_base_dir = "./xml/"
 
+def validate(xmlTree):
+    xmlschema = etree.XMLSchema(etree.parse("xml/output.xsd"))
+    return xmlschema.validate(xmlTree)
+
 def csv_to_xml(filepath):
-    root = ET.Element("root")
+    root = etree.Element("root")
 
     df = pd.read_csv(filepath, sep=',')
     for _, row in df.iterrows():
-        item = ET.SubElement(root, "item")
+        item = etree.SubElement(root, "item")
 
         for col in df.columns:
-            col_element = ET.SubElement(item, col.replace(' ', "_"))
+            col_element = etree.SubElement(item, col.replace(' ', "_"))
             col_element.text = str(row[col])
 
-    tree = ET.ElementTree(root)
+    tree = etree.ElementTree(root)
 
-    with open("./xml/output.xml", "wb") as xmlFile:
-        tree.write(xmlFile)
+    if validate(tree) == True:
+        print(f"Base xml is valid")
+        with open("./xml/output.xml", "wb") as xmlFile:
+            tree.write(xmlFile)
+    else:
+        print(f"Base xml is invalid")
 
 def xml_xpath_query(filepath, query, filename):
     tree = etree.parse(filepath)
@@ -31,10 +38,17 @@ def xml_xpath_query(filepath, query, filename):
         subxml_root.append(product)
     
     subxml_str = etree.tostring(subxml_root, pretty_print=True)
-    print(subxml_str)
 
-    with open(xml_base_dir + filename, "wb") as f:
-        f.write(etree.tostring(subxml_root, pretty_print=True))
+    if validate(tree) == True:
+        print(f"{filename} is valid")
+        with open(xml_base_dir + filename, "wb") as f:
+            f.write(etree.tostring(subxml_root, pretty_print=True))
+    else:
+        print(f"{filename} is invalid")
+        print(f"{filename} is valid")
+
+#Convert csv to xml
+csv_to_xml("csv/car.csv")
 
 #Split into individual sellers and dealerships
 xml_xpath_query("xml/output.xml","//item[seller_type='Individual']", "individual.xml" )
@@ -46,8 +60,8 @@ xml_xpath_query("xml/output.xml","//item[fuel='Petrol']", "petrol.xml" )
 xml_xpath_query("xml/output.xml","//item[fuel='Electric']", "electric.xml" )
 
 #Split by transmition type
-xml_xpath_query("xml/output.xml","//item[transmition='Manual']", "manual_transmition.xml" )
-xml_xpath_query("xml/output.xml","//item[transmition='Automatic']", "automatic_transmition.xml" )
+xml_xpath_query("xml/output.xml","//item[transmission='Manual']", "manual_transmission.xml" )
+xml_xpath_query("xml/output.xml","//item[transmission='Automatic']", "automatic_transmission.xml" )
 
 #Split by owner ammount
 xml_xpath_query("xml/output.xml","//item[owner='First Owner']", "first_owner.xml" )
