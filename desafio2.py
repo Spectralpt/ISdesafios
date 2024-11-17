@@ -67,5 +67,4 @@ xml_xpath_query("xml/output.xml","//item[transmission='Automatic']", "automatic_
 xml_xpath_query("xml/output.xml","//item[owner='First Owner']", "first_owner.xml" )
 xml_xpath_query("xml/output.xml","//item[owner='Second Owner']", "second_owner.xml" )
 xml_xpath_query("xml/output.xml","//item[owner='Third Owner']", "third_owner.xml" )
-xml_xpath_query("xml/output.xml","//item[owner='Fourth Owner & Above Owner']", "fourth_owner_&_above.xml" )
-
+xml_xpath_query("xml/output.xml","//item[owner='Fourth & Above Owner']", "fourth_owner_&_above.xml" )
