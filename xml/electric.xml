@@ -1,5 +1,4 @@
-<filtered_catalog>
-  <item>
+<filtered_catalog><item>
     <name>Toyota Camry Hybrid</name>
     <year>2006</year>
     <selling_price>310000</selling_price>
@@ -9,4 +8,4 @@
     <transmission>Automatic</transmission>
     <owner>Second Owner</owner>
   </item>
-</filtered_catalog>
+  </filtered_catalog>
