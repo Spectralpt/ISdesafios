@@ -7,14 +7,24 @@ xml_base_dir = "./xml/"
 
 # Function to validate XML against a schema
 def validate(xmlTree):
-    xmlschema = etree.XMLSchema(etree.parse("xml/output.xsd"))
-    return xmlschema.validate(xmlTree)
-
+    try:
+        xmlschema = etree.XMLSchema(etree.parse("xml/output.xsd"))
+        return xmlschema.validate(xmlTree)
+    except (etree.XMLSyntaxError, etree.DocumentInvalid) as e:
+        print(f"Schema validation error: {e}")
+        return False
 
 # Function to convert CSV to XML
 def csv_to_xml(filepath):
     root = etree.Element("root")
-    df = pd.read_csv(filepath, sep=',')
+    try:
+        df = pd.read_csv(filepath, sep=',')
+    except FileNotFoundError:
+        print(f"CSV file not found at {filepath}.")
+        return
+    except pd.errors.ParserError as e:
+        print(f"Error parsing CSV: {e}")
+        return
 
     for _, row in df.iterrows():
         item = etree.SubElement(root, "item")
@@ -33,11 +43,21 @@ def csv_to_xml(filepath):
         print(f"Base XML is invalid")
 
 # Function to query and generate sub-XMLs
-
 def xml_xpath_query(filepath, query, filename):
-    tree = etree.parse(filepath)
+    try:
+        tree = etree.parse(filepath)
+    except FileNotFoundError:
+        print(f"File {filepath} not found.")
+        return
+    except etree.XMLSyntaxError as e:
+        print(f"Error parsing XML: {e}")
+        return
 
-    products = tree.xpath(query)
+    try:
+        products = tree.xpath(query)
+    except etree.XPathEvalError as e:
+        print(f"Error in XPath query: {e}")
+        return
 
     subxml_root = etree.Element("filtered_catalog")
 
@@ -46,16 +66,14 @@ def xml_xpath_query(filepath, query, filename):
     
     subxml_str = etree.tostring(subxml_root, pretty_print=True)
 
-    if validate(tree) == True:
+    if validate(tree):
         print(f"{filename} is valid")
         with open(xml_base_dir + filename, "wb") as f:
             f.write(etree.tostring(subxml_root, pretty_print=True))
     else:
         print(f"{filename} is invalid")
-        print(f"{filename} is valid")
 
-
-# Function to display search menu#
+# Function to display search menu
 def display_menu():
     print("Select an option to search in the XML files:")
     print("1. Search by seller type")
@@ -70,11 +88,24 @@ def display_menu():
 
 # Function to search XML using XPath
 def search_xml(file, xpath_query):
-    tree = etree.parse(file)
-    return tree.xpath(xpath_query)
+    try:
+        tree = etree.parse(file)
+        return tree.xpath(xpath_query)
+    except FileNotFoundError:
+        print(f"File {file} not found.")
+        return []
+    except etree.XPathEvalError as e:
+        print(f"Error in XPath query: {e}")
+        return []
+    except etree.XMLSyntaxError as e:
+        print(f"Error parsing XML: {e}")
+        return []
 
 # Function to format and display search results
 def format_results(results):
+    if not results:
+        print("No results found.")
+        return
     for result in results:
         print("Item:")
         for element in result:
@@ -99,8 +130,9 @@ def main():
                 format_results(results)
                 input("Press Enter to continue...")
                 clear_screen()
-            except:
-                print("Invalid seller type. Please try again.")
+            except Exception as e:
+                print(f"Error: {e}")
+                input("Press Enter to continue...")
                 clear_screen()
         elif choice == '2':
             try:
@@ -111,87 +143,81 @@ def main():
                 format_results(results)
                 input("Press Enter to continue...")
                 clear_screen()
-            except:
-                print("Invalid fuel type. Please try again.")
+            except Exception as e:
+                print(f"Error: {e}")
+                input("Press Enter to continue...")
                 clear_screen()
         elif choice == '3':
-            clear_screen()
             try:
+                clear_screen()
                 transmission_type = input("Enter transmission type (Manual/Automatic): ").capitalize()
                 file = f"xml/{'manual_transmission' if transmission_type == 'Manual' else 'automatic_transmission'}.xml"
                 results = search_xml(file, f"//item[transmission='{transmission_type}']")
                 format_results(results)
                 input("Press Enter to continue...")
                 clear_screen()
-            except:
-                print("Invalid transmission type. Please try again.")
+            except Exception as e:
+                print(f"Error: {e}")
+                input("Press Enter to continue...")
                 clear_screen()
         elif choice == '4':
-            clear_screen()
-            try :
+            try:
+                clear_screen()
                 owner_amount = input("Enter owner amount (First Owner/Second Owner/Third Owner/Fourth Owner & Above): ")
                 owner_amount = owner_amount.lower().replace(' ', '_')
                 file = f"xml/{owner_amount}.xml"
                 results = search_xml(file, f"//item[owner='{owner_amount.replace('_', ' ').title()}']")
-                print(f"{file} and {owner_amount.replace('_', ' ').title()}")
-
                 format_results(results)
                 input("Press Enter to continue...")
                 clear_screen()
-            except:
-                print("Invalid owner amount. Please try again.")
+            except Exception as e:
+                print(f"Error: {e}")
+                input("Press Enter to continue...")
                 clear_screen()
-        
         elif choice == '5':
-            clear_screen()
             try:
+                clear_screen()
                 year = input("Enter year: ")
                 file = "xml/car.xml"
                 results = search_xml(file, f"//item[year='{year}']")
                 format_results(results)
-                input("Press Enter to continue...")
-                
                 xml_xpath_query("xml/car.xml", f"//item[year='{year}']", f"year_{year}.xml")
+                input("Press Enter to continue...")
                 clear_screen()
-
-                
-            except:
-                print("Invalid year. Please try again.")
+            except Exception as e:
+                print(f"Error: {e}")
+                input("Press Enter to continue...")
                 clear_screen()
         elif choice == '6':
-            clear_screen()
-            for file in os.listdir(xml_base_dir):
-                if file.endswith(".xml"):
-                    if validate(etree.parse(xml_base_dir + file)):
-                        print(f"{file} is valid")
-                    else:
-                        print(f"{file} is invalid")
-            input("Press Enter to continue...")
-            clear_screen()
-        
-        elif choice == '7':
-            # search by xpath
-            clear_screen()
             try:
+                clear_screen()
+                for file in os.listdir(xml_base_dir):
+                    if file.endswith(".xml"):
+                        if validate(etree.parse(xml_base_dir + file)):
+                            print(f"{file} is valid")
+                        else:
+                            print(f"{file} is invalid")
+                input("Press Enter to continue...")
+                clear_screen()
+            except Exception as e:
+                print(f"Error: {e}")
+                input("Press Enter to continue...")
+                clear_screen()
+        elif choice == '7':
+            try:
+                clear_screen()
                 print("Available categories: ")
                 for element in etree.parse("xml/car.xml").getroot()[0]:
                     print(element.tag)
-                xpath = input("Enter xpath query: ex //item[transmission='Automatic'] ")
-
-                results = search_xml(f"xml/{"car.xml"}", xpath)
+                xpath = input("Enter XPath query (e.g., //item[transmission='Automatic']): ")
+                results = search_xml(f"xml/car.xml", xpath)
                 format_results(results)
                 input("Press Enter to continue...")
-
-                
-               
                 clear_screen()
-
-
-            except:
-                print("Invalid input. Please try again.")
-                input ("Press Enter to continue...")
+            except Exception as e:
+                print(f"Error: {e}")
+                input("Press Enter to continue...")
                 clear_screen()
-
         elif choice == '9':
             break
         else:
@@ -217,3 +243,4 @@ xml_xpath_query("xml/car.xml", "//item[owner='Fourth & Above Owner']", "fourth_&
 # Start the main menu loop
 if __name__ == "__main__":
     main()
+
